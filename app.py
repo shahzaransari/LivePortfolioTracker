@@ -57,7 +57,7 @@ logger = logging.getLogger(__name__)
 
 # Page configuration
 st.set_page_config(
-    page_title="Aurora Live Portfolio Tracker",
+    page_title="Live Portfolio Tracker",
     page_icon="🌌",
     layout="wide",
     initial_sidebar_state="expanded"
@@ -756,8 +756,8 @@ def main():
     initialize_session_state()
     
     # Header
-    st.markdown('<h1>AURORA LIVE PORTFOLIO TRACKER</h1>', unsafe_allow_html=True)
-    st.markdown("Interactive financial analytics with real-time valuation and aurora-inspired visualization")
+    st.markdown('<h1>LIVE PORTFOLIO TRACKER</h1>', unsafe_allow_html=True)
+    st.markdown("Interactive financial analytics with real-time valuation and visualization")
     
     # Load portfolio
     positions = load_portfolio()
