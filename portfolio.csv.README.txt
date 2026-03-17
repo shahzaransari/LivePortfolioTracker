@@ -1,0 +1,18 @@
+
+# Live Portfolio Tracker - Dummy Portfolio
+# -----------------------------------------
+# This file was automatically created because no portfolio.csv was found.
+# You can edit this file with your own holdings.
+# 
+# Format: Ticker,Quantity,AveragePrice
+# Example: AAPL,10,150.25
+# 
+# Current dummy holdings:
+# - AAPL (Apple Inc.) - US stock
+# - MSFT (Microsoft) - US stock  
+# - RELIANCE.NS (Reliance Industries) - Indian stock
+# - SAP.DE (SAP SE) - German stock
+# - TSLA (Tesla) - US stock
+# - GOOGL (Alphabet) - US stock
+# - AMZN (Amazon) - US stock
+# - NVDA (NVIDIA) - US stock
