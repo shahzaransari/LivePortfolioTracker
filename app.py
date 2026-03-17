@@ -582,7 +582,7 @@ def create_allocation_chart(valuation_df):
         df_filtered,
         values='Current Value (Base Currency)',
         names='Ticker',
-        title='PORTFOLIO AURORA',
+        title='PORTFOLIO COMPOSITION',
         hole=0.4,
         color_discrete_sequence=aurora_colors
     )
@@ -650,7 +650,7 @@ def create_pnl_chart(valuation_df):
         df_filtered,
         x='Ticker',
         y='P&L ($ Base)',
-        title='AURORA P&L',
+        title='P&L',
         color=colors,
         color_discrete_map={'#06b6d4': '#06b6d4', '#c026d3': '#c026d3'},
         text=df_filtered['P&L ($ Base)'].apply(lambda x: f'${x:+,.2f}')
