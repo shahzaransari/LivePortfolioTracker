@@ -1,7 +1,7 @@
 # Live Portfolio Tracker - Streamlit Dashboard
 
 ## Overview
-This is Module 6: Streamlit Dashboard for the Live Portfolio Tracker project. It provides a modern web interface for portfolio tracking with real-time market data, interactive charts, and portfolio management capabilities.
+This is Streamlit Dashboard for the Live Portfolio Tracker project. It provides a modern web interface for portfolio tracking with real-time market data, interactive charts, and portfolio management capabilities.
 
 ## Features
 

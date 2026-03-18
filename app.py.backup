@@ -1,24 +1,21 @@
 """
 Module 6: Streamlit Dashboard for Live Portfolio Tracker
-Enterprise Edition with Spectral Aurora Design Language
 
 This module provides a modern web interface for the portfolio tracker using Streamlit.
-It integrates all components (PortfolioManager, MarketDataFetcher, ValuationEngine, TickerSuggester)
-into a beautiful, interactive web dashboard with real-time updates and visualizations.
+It integrates all components (PortfolioManager, MarketDataFetcher, ValuationEngine) into a
+beautiful, interactive web dashboard with real-time updates and visualizations.
 
 Requirements:
     pip install streamlit plotly pandas yfinance
 
 Features:
-    - Enterprise-grade UI with Spectral Aurora design language
-    - Interactive charts using Plotly with Spectral colors
+    - Modern, responsive web interface
+    - Interactive charts using Plotly
     - Real-time portfolio valuation
-    - Ticker suggestion system with S&P 500 + international stocks
     - Sidebar controls for adding/removing positions
     - Automatic data refresh
     - Color-coded P&L metrics
     - Multi-currency support
-    - Glassmorphism design elements
 
 Usage:
     streamlit run app.py
@@ -39,7 +36,6 @@ from datetime import datetime
 import logging
 import sys
 import os
-import re
 
 # Import our custom modules
 try:
@@ -47,7 +43,6 @@ try:
     from portfolio_manager import PortfolioManager, PortfolioPosition
     from market_data import MarketDataFetcher, PriceData
     from valuation import ValuationEngine
-    from ticker_suggester import TickerSuggester
 except ImportError as e:
     st.error(f"Error importing portfolio tracker modules: {e}")
     st.error("Make sure all required modules (config.py, portfolio_manager.py, etc.) are in the same directory.")
@@ -62,108 +57,150 @@ logger = logging.getLogger(__name__)
 
 # Page configuration
 st.set_page_config(
-    page_title="Spectral Intelligence - Portfolio Tracker",
+    page_title="Live Portfolio Tracker",
     page_icon="🌌",
     layout="wide",
     initial_sidebar_state="expanded"
 )
 
-# ============================================================================
-# SPECTRAL AURORA ENTERPRISE UI OVERHAUL
-# ============================================================================
-
-# Import Google Fonts 'Urbanist' (headers) and 'Inter' (body)
-st.markdown("""
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Urbanist:wght@400;500;600;700;800;900&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-""", unsafe_allow_html=True)
-
-# Enterprise CSS Injection with Spectral Aurora Design Language
+# Animated Aurora Background
 st.markdown("""
 <style>
-    /* ===== BASE STYLES ===== */
-    /* Force .stApp background to deep void gradient */
-    .stApp {
-        background: linear-gradient(135deg, #030303 0%, #05020a 100%) !important;
-        min-height: 100vh;
+    /* Aurora background canvas */
+    .ambient-canvas {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        z-index: -1;
+        pointer-events: none;
+        overflow: hidden;
     }
     
-    /* ===== TYPOGRAPHY ===== */
-    /* Headers with Urbanist font */
+    /* Aurora orbs */
+    .orb {
+        position: absolute;
+        border-radius: 50%;
+        filter: blur(80px);
+        opacity: 0.6;
+        animation: floatOrb 20s infinite ease-in-out;
+    }
+    
+    /* Orb 1 - Indigo */
+    .orb:nth-child(1) {
+        width: 500px;
+        height: 500px;
+        background: radial-gradient(circle, #4f46e5, transparent 70%);
+        top: 10%;
+        left: 10%;
+        animation-delay: 0s;
+    }
+    
+    /* Orb 2 - Fuchsia */
+    .orb:nth-child(2) {
+        width: 400px;
+        height: 400px;
+        background: radial-gradient(circle, #c026d3, transparent 70%);
+        top: 60%;
+        right: 15%;
+        animation-delay: 5s;
+    }
+    
+    /* Orb 3 - Cyan */
+    .orb:nth-child(3) {
+        width: 300px;
+        height: 300px;
+        background: radial-gradient(circle, #06b6d4, transparent 70%);
+        bottom: 20%;
+        left: 30%;
+        animation-delay: 10s;
+    }
+    
+    /* Orb floating animation */
+    @keyframes floatOrb {
+        0%, 100% {
+            transform: translate(0, 0) scale(1);
+        }
+        25% {
+            transform: translate(30px, -20px) scale(1.1);
+        }
+        50% {
+            transform: translate(-20px, 30px) scale(0.9);
+        }
+        75% {
+            transform: translate(-30px, -30px) scale(1.05);
+        }
+    }
+    
+    /* Import Aurora fonts */
+    @import url('https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&family=Inter:wght@300;400;500;600;700&display=swap');
+    
+    /* Main container - transparent to show Aurora background */
+    .stApp {
+        background: transparent !important;
+    }
+    
+    /* Headers with Syne font */
     h1, h2, h3, h4, h5, h6 {
-        font-family: 'Urbanist', sans-serif !important;
+        font-family: 'Syne', sans-serif !important;
         font-weight: 800 !important;
     }
     
+    h1 {
+        font-size: 3rem !important;
+        background: linear-gradient(to bottom, #fff, #aaa) !important;
+        -webkit-background-clip: text !important;
+        -webkit-text-fill-color: transparent !important;
+        background-clip: text !important;
+        margin-bottom: 1.5rem !important;
+        letter-spacing: -0.02em !important;
+    }
+    
+    h2 {
+        font-size: 2rem !important;
+        color: #ffffff !important;
+        margin-bottom: 1.5rem !important;
+        position: relative;
+        padding-bottom: 0.5rem;
+    }
+    
+    h2::after {
+        content: '';
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        width: 60px;
+        height: 3px;
+        background: linear-gradient(90deg, #4f46e5, #c026d3, #06b6d4);
+        border-radius: 2px;
+    }
+    
+    h3 {
+        font-size: 1.5rem !important;
+        color: #06b6d4 !important;
+    }
+    
     /* Body text with Inter font */
-    body, .stMarkdown, .stText, .stDataFrame, .stMetric, .stButton, 
-    .stSelectbox, .stTextInput, .stNumberInput, .stAlert, .stExpander {
+    body, .stMarkdown, .stText, .stDataFrame, .stMetric, .stButton, .stSelectbox, .stTextInput {
         font-family: 'Inter', sans-serif !important;
         color: rgba(255, 255, 255, 0.9) !important;
     }
     
-    /* ===== HERO BANNER ===== */
-    .hero-banner {
-        background: linear-gradient(135deg, rgba(0, 242, 255, 0.05) 0%, rgba(255, 0, 85, 0.05) 50%, rgba(255, 204, 0, 0.05) 100%);
-        border-radius: 24px;
-        padding: 3rem 2rem;
-        margin-bottom: 2.5rem;
-        border: 1px solid rgba(255, 255, 255, 0.08);
-        backdrop-filter: blur(20px);
-        position: relative;
-        overflow: hidden;
-    }
-    
-    .hero-banner::before {
-        content: '';
-        position: absolute;
-        top: 0;
-        left: 0;
-        right: 0;
-        height: 1px;
-        background: linear-gradient(90deg, transparent, #00f2ff, #ff0055, #ffcc00, transparent);
-    }
-    
-    .hero-title {
-        font-family: 'Urbanist', sans-serif !important;
-        font-weight: 900 !important;
-        font-size: 3.5rem !important;
-        background: linear-gradient(90deg, #00f2ff, #ff0055, #ffcc00) !important;
-        -webkit-background-clip: text !important;
-        -webkit-text-fill-color: transparent !important;
-        background-clip: text !important;
-        margin-bottom: 0.5rem !important;
-        letter-spacing: -0.02em !important;
-        text-align: center;
-    }
-    
-    .hero-subtitle {
-        font-family: 'Inter', sans-serif !important;
-        font-size: 1.2rem !important;
-        color: rgba(255, 255, 255, 0.7) !important;
-        text-align: center;
-        max-width: 800px;
-        margin: 0 auto;
-        line-height: 1.6;
-    }
-    
-    /* ===== GLASSMORPHISM CARDS ===== */
-    /* Metric cards */
+    /* Glassmorphism Card styling for metric containers */
     div[data-testid="stMetric"], .stMetric {
-        background: rgba(255, 255, 255, 0.02) !important;
-        backdrop-filter: blur(10px) !important;
+        background: rgba(15, 15, 20, 0.7) !important;
         border: 1px solid rgba(255, 255, 255, 0.08) !important;
-        border-radius: 16px !important;
+        backdrop-filter: blur(40px) !important;
+        border-radius: 24px !important;
         padding: 1.5rem !important;
-        transition: all 0.3s ease !important;
+        transition: transform 0.3s ease !important;
     }
     
     div[data-testid="stMetric"]:hover, .stMetric:hover {
         transform: translateY(-5px) !important;
-        border-color: rgba(255, 255, 255, 0.15) !important;
+        border-color: rgba(255, 255, 255, 0.2) !important;
         box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3) !important;
-        background: rgba(255, 255, 255, 0.04) !important;
     }
     
     /* Metric value styling */
@@ -171,7 +208,7 @@ st.markdown("""
         font-size: 2.2rem !important;
         font-weight: 700 !important;
         color: #ffffff !important;
-        font-family: 'Urbanist', sans-serif !important;
+        font-family: 'Syne', sans-serif !important;
     }
     
     /* Metric label styling */
@@ -183,41 +220,77 @@ st.markdown("""
         font-weight: 600 !important;
     }
     
-    /* Metric delta styling with Spectral colors */
+    /* Metric delta styling */
     div[data-testid="stMetricDelta"] {
         font-weight: 600 !important;
-        font-family: 'Urbanist', sans-serif !important;
+        font-family: 'Syne', sans-serif !important;
     }
     
     div[data-testid="stMetricDelta"]:contains("+") {
-        color: #00f2ff !important;
+        color: #06b6d4 !important;
     }
     
     div[data-testid="stMetricDelta"]:contains("-") {
-        color: #ff0055 !important;
+        color: #c026d3 !important;
+    }
+    
+    /* Sidebar styling */
+    section[data-testid="stSidebar"] {
+        background: rgba(10, 10, 15, 0.8) !important;
+        border-right: 1px solid rgba(255, 255, 255, 0.1) !important;
+        backdrop-filter: blur(40px) !important;
+    }
+    
+    /* Button styling */
+    .stButton button {
+        background: linear-gradient(90deg, #4f46e5, #c026d3) !important;
+        color: white !important;
+        border: none !important;
+        border-radius: 12px !important;
+        padding: 0.75rem 1.5rem !important;
+        font-weight: 600 !important;
+        font-family: 'Inter', sans-serif !important;
+        transition: all 0.3s ease !important;
+        width: 100% !important;
+    }
+    
+    .stButton button:hover {
+        transform: translateY(-2px) !important;
+        box-shadow: 0 10px 20px rgba(79, 70, 229, 0.3) !important;
+    }
+    
+    /* Secondary button styling */
+    .stButton button[kind="secondary"] {
+        background: rgba(255, 255, 255, 0.1) !important;
+        border: 1px solid rgba(255, 255, 255, 0.2) !important;
+    }
+    
+    .stButton button[kind="secondary"]:hover {
+        border-color: #06b6d4 !important;
+        background: rgba(6, 182, 212, 0.1) !important;
+        box-shadow: 0 10px 20px rgba(6, 182, 212, 0.2) !important;
     }
     
     /* Dataframe styling - Glassmorphism */
     .stDataFrame {
-        background: rgba(255, 255, 255, 0.02) !important;
+        background: rgba(15, 15, 20, 0.7) !important;
         border: 1px solid rgba(255, 255, 255, 0.08) !important;
-        border-radius: 16px !important;
+        border-radius: 24px !important;
         overflow: hidden !important;
-        backdrop-filter: blur(10px) !important;
+        backdrop-filter: blur(40px) !important;
         transition: transform 0.3s ease !important;
     }
     
     .stDataFrame:hover {
         transform: translateY(-5px) !important;
-        border-color: rgba(255, 255, 255, 0.15) !important;
     }
     
     /* Table header styling */
     .stDataFrame thead th {
-        background: linear-gradient(90deg, rgba(0, 242, 255, 0.1), rgba(255, 0, 85, 0.1), rgba(255, 204, 0, 0.1)) !important;
+        background: linear-gradient(90deg, rgba(79, 70, 229, 0.2), rgba(192, 38, 211, 0.2)) !important;
         color: #ffffff !important;
         font-weight: 600 !important;
-        font-family: 'Urbanist', sans-serif !important;
+        font-family: 'Syne', sans-serif !important;
         border-bottom: 1px solid rgba(255, 255, 255, 0.1) !important;
         padding: 1rem !important;
     }
@@ -234,44 +307,28 @@ st.markdown("""
         background: rgba(255, 255, 255, 0.05) !important;
     }
     
-    /* ===== SIDEBAR STYLING ===== */
-    section[data-testid="stSidebar"] {
-        background: rgba(10, 10, 15, 0.85) !important;
-        border-right: 1px solid rgba(255, 255, 255, 0.1) !important;
-        backdrop-filter: blur(20px) !important;
+    /* Divider styling */
+    .stDivider {
+        border-color: rgba(255, 255, 255, 0.1) !important;
     }
     
-    /* ===== BUTTON STYLING ===== */
-    .stButton button {
-        background: linear-gradient(90deg, #00f2ff, #ff0055) !important;
-        color: white !important;
-        border: none !important;
+    /* Expander styling */
+    .streamlit-expanderHeader {
+        background: rgba(15, 15, 20, 0.7) !important;
+        border: 1px solid rgba(255, 255, 255, 0.08) !important;
         border-radius: 12px !important;
-        padding: 0.75rem 1.5rem !important;
+        color: #06b6d4 !important;
         font-weight: 600 !important;
-        font-family: 'Inter', sans-serif !important;
-        transition: all 0.3s ease !important;
-        width: 100% !important;
+        font-family: 'Syne', sans-serif !important;
+        backdrop-filter: blur(40px) !important;
     }
     
-    .stButton button:hover {
-        transform: translateY(-2px) !important;
-        box-shadow: 0 10px 20px rgba(0, 242, 255, 0.3) !important;
+    .streamlit-expanderHeader:hover {
+        border-color: #06b6d4 !important;
+        background: rgba(6, 182, 212, 0.1) !important;
     }
     
-    /* Secondary button styling */
-    .stButton button[kind="secondary"] {
-        background: rgba(255, 255, 255, 0.1) !important;
-        border: 1px solid rgba(255, 255, 255, 0.2) !important;
-    }
-    
-    .stButton button[kind="secondary"]:hover {
-        border-color: #00f2ff !important;
-        background: rgba(0, 242, 255, 0.1) !important;
-        box-shadow: 0 10px 20px rgba(0, 242, 255, 0.2) !important;
-    }
-    
-    /* ===== INPUT FIELD STYLING ===== */
+    /* Input field styling */
     .stTextInput input, .stNumberInput input, .stSelectbox select {
         background: rgba(255, 255, 255, 0.05) !important;
         border: 1px solid rgba(255, 255, 255, 0.2) !important;
@@ -282,62 +339,47 @@ st.markdown("""
     }
     
     .stTextInput input:focus, .stNumberInput input:focus, .stSelectbox select:focus {
-        border-color: #00f2ff !important;
-        box-shadow: 0 0 0 2px rgba(0, 242, 255, 0.2) !important;
-        background: rgba(0, 242, 255, 0.05) !important;
+        border-color: #4f46e5 !important;
+        box-shadow: 0 0 0 2px rgba(79, 70, 229, 0.2) !important;
+        background: rgba(79, 70, 229, 0.05) !important;
     }
     
-    /* ===== EXPANDER STYLING ===== */
-    .streamlit-expanderHeader {
-        background: rgba(255, 255, 255, 0.02) !important;
-        border: 1px solid rgba(255, 255, 255, 0.08) !important;
-        border-radius: 12px !important;
-        color: #00f2ff !important;
-        font-weight: 600 !important;
-        font-family: 'Urbanist', sans-serif !important;
-        backdrop-filter: blur(10px) !important;
-    }
-    
-    .streamlit-expanderHeader:hover {
-        border-color: #00f2ff !important;
-        background: rgba(0, 242, 255, 0.1) !important;
-    }
-    
-    /* ===== ALERT STYLING ===== */
+    /* Success/Error/Info/Warning messages */
     .stAlert {
-        background: rgba(255, 255, 255, 0.02) !important;
+        background: rgba(15, 15, 20, 0.7) !important;
         border: 1px solid rgba(255, 255, 255, 0.08) !important;
         border-radius: 12px !important;
-        backdrop-filter: blur(10px) !important;
+        backdrop-filter: blur(40px) !important;
     }
     
     .stSuccess {
-        border-left: 4px solid #00f2ff !important;
+        border-left: 4px solid #06b6d4 !important;
     }
     
     .stError {
-        border-left: 4px solid #ff0055 !important;
+        border-left: 4px solid #c026d3 !important;
     }
     
     .stWarning {
-        border-left: 4px solid #ffcc00 !important;
+        border-left: 4px solid #f59e0b !important;
     }
     
     .stInfo {
-        border-left: 4px solid #00f2ff !important;
+        border-left: 4px solid #4f46e5 !important;
     }
     
-    /* ===== DIVIDER STYLING ===== */
-    .stDivider {
-        border-color: rgba(255, 255, 255, 0.1) !important;
-    }
-    
-    /* ===== SPINNER STYLING ===== */
+    /* Spinner styling */
     .stSpinner > div {
-        border-color: #00f2ff transparent transparent transparent !important;
+        border-color: #4f46e5 transparent transparent transparent !important;
     }
     
-    /* ===== CUSTOM SCROLLBAR ===== */
+    /* Caption styling */
+    .stCaption {
+        color: rgba(255, 255, 255, 0.6) !important;
+        font-size: 0.85rem !important;
+    }
+    
+    /* Custom scrollbar */
     ::-webkit-scrollbar {
         width: 8px;
         height: 8px;
@@ -349,61 +391,25 @@ st.markdown("""
     }
     
     ::-webkit-scrollbar-thumb {
-        background: linear-gradient(180deg, #00f2ff, #ff0055);
+        background: linear-gradient(180deg, #4f46e5, #c026d3);
         border-radius: 4px;
     }
     
     ::-webkit-scrollbar-thumb:hover {
-        background: linear-gradient(180deg, #00f2ff, #ffcc00);
-    }
-    
-    /* ===== SECTION HEADERS ===== */
-    .section-header {
-        font-family: 'Urbanist', sans-serif !important;
-        font-size: 2rem !important;
-        color: #ffffff !important;
-        margin-bottom: 1.5rem !important;
-        position: relative;
-        padding-bottom: 0.5rem;
-    }
-    
-    .section-header::after {
-        content: '';
-        position: absolute;
-        bottom: 0;
-        left: 0;
-        width: 60px;
-        height: 3px;
-        background: linear-gradient(90deg, #00f2ff, #ff0055, #ffcc00);
-        border-radius: 2px;
-    }
-    
-    /* ===== FOOTER STYLING ===== */
-    .footer {
-        margin-top: 3rem;
-        padding-top: 1.5rem;
-        border-top: 1px solid rgba(255, 255, 255, 0.1);
-        color: rgba(255, 255, 255, 0.6);
-        font-size: 0.85rem;
+        background: linear-gradient(180deg, #4f46e5, #06b6d4);
     }
 </style>
 
-<!-- Hero Banner HTML -->
-<div class="hero-banner">
-    <h1 class="hero-title">SPECTRAL INTELLIGENCE</h1>
-    <div class="hero-subtitle">
-        Enterprise-grade portfolio analytics with real-time valuation, predictive insights, 
-        and global market intelligence powered by spectral computation.
-    </div>
+<div class="ambient-canvas">
+    <div class="orb"></div>
+    <div class="orb"></div>
+    <div class="orb"></div>
 </div>
 """, unsafe_allow_html=True)
 
-# ============================================================================
-# CORE APPLICATION FUNCTIONS
-# ============================================================================
-
+# Initialize session state for persistent objects
 def initialize_session_state():
-    """Initialize session state with portfolio manager, data fetcher, valuation engine, and ticker suggester."""
+    """Initialize session state with portfolio manager, data fetcher, and valuation engine."""
     if 'portfolio_manager' not in st.session_state:
         st.session_state.portfolio_manager = PortfolioManager()
         logger.info("Initialized PortfolioManager in session state")
@@ -415,10 +421,6 @@ def initialize_session_state():
     if 'valuation_engine' not in st.session_state:
         st.session_state.valuation_engine = ValuationEngine()
         logger.info("Initialized ValuationEngine in session state")
-    
-    if 'ticker_suggester' not in st.session_state:
-        st.session_state.ticker_suggester = TickerSuggester()
-        logger.info("Initialized TickerSuggester in session state")
     
     if 'last_refresh' not in st.session_state:
         st.session_state.last_refresh = None
@@ -572,8 +574,8 @@ def create_allocation_chart(valuation_df):
     if df_filtered.empty:
         return None
     
-    # Spectral Aurora colors
-    spectral_colors = ['#00f2ff', '#ff0055', '#ffcc00', '#8b5cf6', '#ec4899', '#0ea5e9']
+    # Aurora colors
+    aurora_colors = ['#4f46e5', '#c026d3', '#06b6d4', '#8b5cf6', '#ec4899', '#0ea5e9']
     
     # Create donut chart
     fig = px.pie(
@@ -582,7 +584,7 @@ def create_allocation_chart(valuation_df):
         names='Ticker',
         title='PORTFOLIO COMPOSITION',
         hole=0.4,
-        color_discrete_sequence=spectral_colors
+        color_discrete_sequence=aurora_colors
     )
     
     fig.update_traces(
@@ -598,7 +600,7 @@ def create_allocation_chart(valuation_df):
         plot_bgcolor='rgba(0,0,0,0)',
         title_x=0.5,
         title_font_size=20,
-        title_font_family='Urbanist',
+        title_font_family='Syne',
         title_font_color='#ffffff',
         showlegend=True,
         legend=dict(
@@ -640,8 +642,8 @@ def create_pnl_chart(valuation_df):
     # Sort by P&L for better visualization
     df_filtered = df_filtered.sort_values('P&L ($ Base)', ascending=False)
     
-    # Create color array based on P&L values using Spectral colors
-    colors = ['#00f2ff' if x >= 0 else '#ff0055' for x in df_filtered['P&L ($ Base)']]
+    # Create color array based on P&L values using Aurora colors
+    colors = ['#06b6d4' if x >= 0 else '#c026d3' for x in df_filtered['P&L ($ Base)']]
     
     # Create bar chart
     fig = px.bar(
@@ -650,7 +652,7 @@ def create_pnl_chart(valuation_df):
         y='P&L ($ Base)',
         title='P&L',
         color=colors,
-        color_discrete_map={'#00f2ff': '#00f2ff', '#ff0055': '#ff0055'},
+        color_discrete_map={'#06b6d4': '#06b6d4', '#c026d3': '#c026d3'},
         text=df_filtered['P&L ($ Base)'].apply(lambda x: f'${x:+,.2f}')
     )
     
@@ -666,7 +668,7 @@ def create_pnl_chart(valuation_df):
         plot_bgcolor='rgba(0,0,0,0)',
         title_x=0.5,
         title_font_size=20,
-        title_font_family='Urbanist',
+        title_font_family='Syne',
         title_font_color='#ffffff',
         xaxis_title="TICKER",
         yaxis_title="P&L ($)",
@@ -675,13 +677,13 @@ def create_pnl_chart(valuation_df):
         font=dict(family='Inter', size=12, color='rgba(255,255,255,0.8)'),
         xaxis=dict(
             tickfont=dict(family='Inter', size=11, color='rgba(255,255,255,0.7)'),
-            title_font=dict(family='Urbanist', size=14, color='#00f2ff'),
+            title_font=dict(family='Syne', size=14, color='#4f46e5'),
             tickangle=45
         ),
         yaxis=dict(
             tickformat="$,.0f",
             tickfont=dict(family='Inter', size=11, color='rgba(255,255,255,0.7)'),
-            title_font=dict(family='Urbanist', size=14, color='#00f2ff'),
+            title_font=dict(family='Syne', size=14, color='#4f46e5'),
             gridcolor='rgba(255,255,255,0.1)',
             zerolinecolor='rgba(255,255,255,0.3)'
         ),
@@ -693,7 +695,7 @@ def create_pnl_chart(valuation_df):
         )
     )
     
-    # Add horizontal line at y=0 with Spectral styling
+    # Add horizontal line at y=0 with Aurora styling
     fig.add_hline(
         y=0, 
         line_width=2, 
@@ -701,7 +703,7 @@ def create_pnl_chart(valuation_df):
         line_color="rgba(255,255,255,0.3)",
         annotation_text="BREAKEVEN",
         annotation_position="bottom right",
-        annotation_font=dict(family='Urbanist', size=10, color='rgba(255,255,255,0.6)'),
+        annotation_font=dict(family='Syne', size=10, color='rgba(255,255,255,0.6)'),
         annotation_bgcolor='rgba(15,15,20,0.7)',
         annotation_bordercolor='rgba(255,255,255,0.1)'
     )
@@ -748,39 +750,21 @@ def format_valuation_dataframe(df):
     
     return df_display
 
-def extract_ticker_from_formatted_string(formatted_ticker: str) -> str:
-    """
-    Extract ticker symbol from formatted string like "Apple Inc. (AAPL)".
-    
-    Args:
-        formatted_ticker: String in format "Company Name (TICKER)"
-        
-    Returns:
-        Ticker symbol (e.g., "AAPL", "SAP.DE", "RELIANCE.NS")
-    """
-    # Use regex to find text inside parentheses
-    match = re.search(r'\(([^)]+)\)', formatted_ticker)
-    if match:
-        return match.group(1).strip()
-    
-    # If no parentheses found, return the string as-is
-    return formatted_ticker.strip()
-
-# ============================================================================
-# MAIN APPLICATION
-# ============================================================================
-
 def main():
     """Main function to run the Streamlit dashboard."""
     # Initialize session state
     initialize_session_state()
     
+    # Header
+    st.markdown('<h1>LIVE PORTFOLIO TRACKER</h1>', unsafe_allow_html=True)
+    st.markdown("Interactive financial analytics with real-time valuation and visualization")
+    
     # Load portfolio
     positions = load_portfolio()
     
-    # ===== SIDEBAR =====
+    # Sidebar
     with st.sidebar:
-        st.markdown("### 📊 DASHBOARD CONTROLS")
+        st.markdown("### 📊 Dashboard Controls")
         
         # Refresh button
         if st.button("🔄 Refresh Market Data", type="primary", use_container_width=True):
@@ -798,47 +782,32 @@ def main():
         
         st.divider()
         
-        # ===== ADD POSITION FORM =====
-        with st.expander("➕ ADD NEW POSITION", expanded=False):
+        # Add position form
+        with st.expander("➕ Add New Position", expanded=False):
             with st.form("add_position_form"):
-                # Get ticker suggestions
-                ticker_options = st.session_state.ticker_suggester.get_ticker_list()
-                
-                # Searchable selectbox for tickers
-                selected_ticker = st.selectbox(
-                    "Search Company or Ticker",
-                    options=ticker_options,
-                    index=0 if ticker_options else None,
-                    help="Type to search through S&P 500 and international stocks"
-                )
-                
+                ticker = st.text_input("Ticker Symbol", placeholder="AAPL").upper()
                 quantity = st.number_input("Quantity", min_value=0.01, value=1.0, step=0.01)
                 avg_price = st.number_input("Average Price", min_value=0.01, value=100.0, step=0.01)
                 
                 if st.form_submit_button("Add Position", type="secondary"):
-                    if selected_ticker and quantity > 0 and avg_price > 0:
+                    if ticker and quantity > 0 and avg_price > 0:
                         try:
-                            # Extract ticker symbol from formatted string
-                            ticker_symbol = extract_ticker_from_formatted_string(selected_ticker)
-                            
                             new_position = PortfolioPosition(
-                                ticker=ticker_symbol,
+                                ticker=ticker,
                                 quantity=quantity,
                                 average_price=avg_price
                             )
                             st.session_state.portfolio_manager.add_position(new_position)
                             st.session_state.portfolio_manager.save_to_csv("portfolio.csv")
-                            st.success(f"Added position: {ticker_symbol}")
+                            st.success(f"Added position: {ticker}")
                             st.rerun()
                         except ValueError as e:
                             st.error(f"Error adding position: {e}")
-                        except Exception as e:
-                            st.error(f"Unexpected error: {e}")
                     else:
                         st.error("Please fill all fields with valid values")
         
-        # ===== REMOVE POSITION FORM =====
-        with st.expander("🗑️ REMOVE POSITION", expanded=False):
+        # Remove position form
+        with st.expander("🗑️ Remove Position", expanded=False):
             if positions:
                 ticker_options = [pos.ticker for pos in positions]
                 ticker_to_remove = st.selectbox("Select Ticker to Remove", ticker_options)
@@ -854,8 +823,8 @@ def main():
         
         st.divider()
         
-        # ===== PORTFOLIO INFO =====
-        st.markdown("### 📋 PORTFOLIO INFO")
+        # Portfolio info
+        st.markdown("### 📋 Portfolio Info")
         if positions:
             st.metric("Total Positions", len(positions))
             total_investment = sum(pos.total_cost for pos in positions)
@@ -870,8 +839,8 @@ def main():
         
         st.divider()
         
-        # ===== INSTRUCTIONS =====
-        with st.expander("ℹ️ HOW TO USE"):
+        # Instructions
+        with st.expander("ℹ️ How to use"):
             st.markdown("""
             1. **Add positions** using the form in the sidebar
             2. **Refresh market data** to get latest prices
@@ -882,7 +851,7 @@ def main():
             The dashboard automatically saves changes to portfolio.csv.
             """)
     
-    # ===== MAIN CONTENT AREA =====
+    # Main content area
     if not positions:
         st.info("💡 Your portfolio is empty. Add positions using the sidebar to get started!")
         return
@@ -901,8 +870,8 @@ def main():
         st.warning("Unable to load valuation data. Please check your internet connection and try refreshing.")
         return
     
-    # ===== PORTFOLIO SUMMARY METRICS =====
-    st.markdown('<div class="section-header">OVERVIEW</div>', unsafe_allow_html=True)
+    # Portfolio Summary Metrics (Top Row)
+    st.markdown('<h2>OVERVIEW</h2>', unsafe_allow_html=True)
     
     summary = get_portfolio_summary(valuation_df)
     if summary:
@@ -950,8 +919,8 @@ def main():
     
     st.divider()
     
-    # ===== CHARTS =====
-    st.markdown('<div class="section-header">ANALYTICS</div>', unsafe_allow_html=True)
+    # Charts (Middle Row)
+    st.markdown('<h2>ANALYTICS</h2>', unsafe_allow_html=True)
     
     if len(valuation_df) > 1:  # More than just TOTAL row
         col1, col2 = st.columns(2)
@@ -974,21 +943,21 @@ def main():
     
     st.divider()
     
-    # ===== DATA TABLE =====
-    st.markdown('<div class="section-header">VALUATION</div>', unsafe_allow_html=True)
+    # Data Table (Bottom Row)
+    st.markdown('<h2>VALUATION</h2>', unsafe_allow_html=True)
     
     # Format the DataFrame for display
     df_display = format_valuation_dataframe(valuation_df)
     
     # Display the DataFrame
     if not df_display.empty:
-        # Apply conditional formatting for P&L columns with Spectral colors
+        # Apply conditional formatting for P&L columns with Aurora colors
         def color_pnl(val):
             if isinstance(val, str) and val != "N/A":
                 if val.startswith("-$") or val.endswith("-%"):
-                    return 'color: #ff0055; font-weight: 600'
+                    return 'color: #c026d3; font-weight: 600'
                 elif val.startswith("+$") or val.endswith("+%"):
-                    return 'color: #00f2ff; font-weight: 600'
+                    return 'color: #06b6d4; font-weight: 600'
             return ''
         
         # Create styled DataFrame
@@ -1024,9 +993,8 @@ def main():
     else:
         st.info("No valuation data to display")
     
-    # ===== FOOTER =====
+    # Footer
     st.divider()
-    st.markdown('<div class="footer">', unsafe_allow_html=True)
     col1, col2, col3 = st.columns(3)
     with col1:
         st.caption(f"Base Currency: {config.default_currency}")
@@ -1035,7 +1003,6 @@ def main():
             st.caption(f"Last updated: {st.session_state.last_refresh.strftime('%Y-%m-%d %H:%M:%S')}")
     with col3:
         st.caption(f"Total positions: {len(positions)}")
-    st.markdown('</div>', unsafe_allow_html=True)
 
 if __name__ == "__main__":
     main()
